@@ -1,0 +1,78 @@
+import {
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+} from '@mui/material'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { Table } from 'react-bootstrap'
+import { CoinList } from '../config/api'
+import { CryptoState } from '../CryptoContext'
+
+function Practise() {
+  const { currency,symbol } = CryptoState
+  const [coins, setCoin] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState("")
+  const fetchCoins = async () => {
+    setLoading(true)
+    const { data } = await axios.get(CoinList(currency))
+      setCoin(data);
+      setLoading(false);
+    } 
+  useEffect(() => {
+    fetchCoins()
+  }, [currency])
+  const handleSearch = () => {
+    return coins.filter((coin) => coin.name.toLowerCase().includes(search))
+  }
+
+  return (
+    <>
+      <TextField
+        style={{ color: 'white' }}
+        placeholder="Search Coins Here"
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {['Name', 'Rank', 'Class'].map((head) => (
+                <TableCell
+                  style={{ color: 'red', fontWeight: 500 }}
+                  align={head === 'Name' ? ' ' : 'right'}
+                >
+                  {head}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {handleSearch().map((head) => {
+              return (
+                  <TableRow>
+                      <TableCell>
+                          <img src={head?.img} style={{height: "50"}} />
+
+                     
+                          <div style={{display:"flex", flexDirection:"column"}}>
+                              <span > {head.symbol}</span> 
+                              <span>{head.name}</span>
+                          </div>
+                          
+                      </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  )
+}
+
+export default Practise
